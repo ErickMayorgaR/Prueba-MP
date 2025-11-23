@@ -67,7 +67,7 @@ export class ExpedienteController {
       }
 
       const id = parseInt(req.params.id);
-      const expediente = await expedienteService.updateExpediente(id, req.body, req.user.id);
+      const expediente = await expedienteService.updateExpediente(id, req.body, req.user.id, req.user.role);
 
       res.status(200).json({
         success: true,
@@ -87,7 +87,7 @@ export class ExpedienteController {
       }
 
       const id = parseInt(req.params.id);
-      const expediente = await expedienteService.submitForReview(id, req.user.id);
+      const expediente = await expedienteService.submitForReview(id, req.user.id, req.user.role);
 
       res.status(200).json({
         success: true,
@@ -107,7 +107,7 @@ export class ExpedienteController {
       }
 
       const id = parseInt(req.params.id);
-      const expediente = await expedienteService.approveExpediente(id, req.user.id);
+      const expediente = await expedienteService.approveExpediente(id, req.user.id, req.user.role);
 
       res.status(200).json({
         success: true,
@@ -127,7 +127,7 @@ export class ExpedienteController {
       }
 
       const id = parseInt(req.params.id);
-      const expediente = await expedienteService.rejectExpediente(id, req.body, req.user.id);
+      const expediente = await expedienteService.rejectExpediente(id, req.body, req.user.id, req.user.role);
 
       res.status(200).json({
         success: true,
@@ -147,7 +147,7 @@ export class ExpedienteController {
       }
 
       const id = parseInt(req.params.id);
-      const expediente = await expedienteService.reopenExpediente(id, req.user.id);
+      const expediente = await expedienteService.reopenExpediente(id, req.user.id, req.user.role);
 
       res.status(200).json({
         success: true,

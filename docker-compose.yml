@@ -1,7 +1,6 @@
 version: '3.8'
 
 services:
-  # SQL Server Database
   database:
     build:
       context: ./database
@@ -18,8 +17,6 @@ services:
     networks:
       - dicri-network
   
-
-  # Backend API
   backend:
     build:
       context: ./backend
@@ -44,12 +41,13 @@ services:
       RATE_LIMIT_WINDOW_MS: '900000'
       RATE_LIMIT_MAX_REQUESTS: '100'
       LOG_LEVEL: 'info'
+      LOG_DIR: 'logs'
     ports:
       - "5000:5000"
     depends_on:
       - database
     volumes:
-      - ./backend/logs:/app/logs
+      - backend-logs:/app/logs
     networks:
       - dicri-network
     restart: unless-stopped
@@ -60,7 +58,6 @@ services:
       retries: 3
       start_period: 40s
 
-  # Frontend
   frontend:
     build:
       context: ./frontend
@@ -78,6 +75,8 @@ services:
 
 volumes:
   mssql-data:
+    driver: local
+  backend-logs:
     driver: local
 
 networks:

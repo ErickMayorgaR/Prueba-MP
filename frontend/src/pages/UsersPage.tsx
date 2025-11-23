@@ -357,7 +357,7 @@ const UserModal: React.FC<UserModalProps> = ({ user, onClose, onSuccess }) => {
                 minLength={6}
               />
               <p className="text-xs text-gray-500 mt-1">
-                La contraseña debe tener al menos 6 caracteres
+                La contraseña debe tener al menos 8 caracteres
               </p>
             </div>
 

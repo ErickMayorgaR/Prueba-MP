@@ -113,7 +113,7 @@ router.use(authenticate);
  */
 router.post(
   '/',
-  authorize(UserRole.TECNICO),
+  authorize(UserRole.TECNICO, UserRole.ADMIN),
   validateBody(CreateExpedienteDTO),
   expedienteController.createExpediente
 );
@@ -249,7 +249,7 @@ router.get('/:id', expedienteController.getExpedienteById);
  */
 router.put(
   '/:id',
-  authorize(UserRole.TECNICO),
+  authorize(UserRole.TECNICO, UserRole.ADMIN),
   validateBody(UpdateExpedienteDTO),
   expedienteController.updateExpediente
 );
@@ -284,7 +284,7 @@ router.put(
  */
 router.post(
   '/:id/submit',
-  authorize(UserRole.TECNICO),
+  authorize(UserRole.TECNICO, UserRole.ADMIN),
   expedienteController.submitForReview
 );
 
@@ -318,7 +318,7 @@ router.post(
  */
 router.post(
   '/:id/approve',
-  authorize(UserRole.COORDINADOR),
+  authorize(UserRole.COORDINADOR, UserRole.ADMIN),
   expedienteController.approveExpediente
 );
 
@@ -364,7 +364,7 @@ router.post(
  */
 router.post(
   '/:id/reject',
-  authorize(UserRole.COORDINADOR),
+  authorize(UserRole.COORDINADOR, UserRole.ADMIN),
   validateBody(RejectExpedienteDTO),
   expedienteController.rejectExpediente
 );
@@ -399,7 +399,7 @@ router.post(
  */
 router.post(
   '/:id/reopen',
-  authorize(UserRole.TECNICO),
+  authorize(UserRole.TECNICO, UserRole.ADMIN),
   expedienteController.reopenExpediente
 );
 

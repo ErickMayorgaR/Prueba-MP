@@ -15,7 +15,6 @@ const ExpedientesPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
 
-  // Filters
   const [filters, setFilters] = useState({
     status: searchParams.get('status') || '',
     search: searchParams.get('search') || '',
@@ -50,23 +49,20 @@ const ExpedientesPage: React.FC = () => {
   };
 
   const getStatusBadge = (status: string) => {
-    const statusConfig: Record<
-      string,
-      { label: string; className: string }
-    > = {
-      EN_REGISTRO: {
+    const statusConfig: { [key: string]: { label: string; className: string } } = {
+      'EN_REGISTRO': {
         label: 'En Registro',
         className: 'badge-warning',
       },
-      EN_REVISION: {
+      'EN_REVISION': {
         label: 'En Revisión',
         className: 'badge bg-blue-100 text-blue-800',
       },
-      APROBADO: {
+      'APROBADO': {
         label: 'Aprobado',
         className: 'badge-success',
       },
-      RECHAZADO: {
+      'RECHAZADO': {
         label: 'Rechazado',
         className: 'badge-danger',
       },
@@ -82,7 +78,6 @@ const ExpedientesPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Expedientes</h1>
@@ -90,7 +85,7 @@ const ExpedientesPage: React.FC = () => {
             Gestión de expedientes de investigación criminalística
           </p>
         </div>
-        {user?.role === 'TECNICO' && (
+        {(user?.role === 'TECNICO' || user?.role === 'ADMIN') && (
           <button
             onClick={() => setShowCreateModal(true)}
             className="btn-primary flex items-center space-x-2"
@@ -101,7 +96,6 @@ const ExpedientesPage: React.FC = () => {
         )}
       </div>
 
-      {/* Filters */}
       <div className="card">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
@@ -137,7 +131,6 @@ const ExpedientesPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Expedientes List */}
       <div className="card">
         {loading ? (
           <div className="text-center py-12 text-gray-500">Cargando...</div>
@@ -145,7 +138,7 @@ const ExpedientesPage: React.FC = () => {
           <div className="text-center py-12">
             <FolderIcon className="mx-auto text-gray-400 mb-4" size={48} />
             <p className="text-gray-600">No se encontraron expedientes</p>
-            {user?.role === 'TECNICO' && (
+            {(user?.role === 'TECNICO' || user?.role === 'ADMIN') && (
               <button
                 onClick={() => setShowCreateModal(true)}
                 className="btn-primary mt-4"
@@ -215,7 +208,6 @@ const ExpedientesPage: React.FC = () => {
         )}
       </div>
 
-      {/* Create Modal */}
       {showCreateModal && (
         <CreateExpedienteModal
           onClose={() => setShowCreateModal(false)}
@@ -229,7 +221,6 @@ const ExpedientesPage: React.FC = () => {
   );
 };
 
-// Create Expediente Modal Component
 interface CreateExpedienteModalProps {
   onClose: () => void;
   onSuccess: () => void;

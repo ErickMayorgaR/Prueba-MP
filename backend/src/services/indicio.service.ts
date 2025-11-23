@@ -3,12 +3,13 @@ import { Indicio } from '../entities/Indicio';
 import { Expediente, ExpedienteStatus } from '../entities/Expediente';
 import { AppError } from '../middleware/error.middleware';
 import { CreateIndicioDTO, UpdateIndicioDTO } from '../dto/indicio.dto';
+import { UserRole } from '../entities/User';
 
 export class IndicioService {
   private indicioRepository = AppDataSource.getRepository(Indicio);
   private expedienteRepository = AppDataSource.getRepository(Expediente);
 
-  async createIndicio(data: CreateIndicioDTO, technicianId: number): Promise<Indicio> {
+  async createIndicio(data: CreateIndicioDTO, technicianId: number, userRole: string): Promise<Indicio> {
     const expediente = await this.expedienteRepository.findOne({
       where: { id: data.expediente_id },
     });
@@ -21,7 +22,7 @@ export class IndicioService {
       throw new AppError('Solo se pueden agregar indicios a expedientes en estado EN_REGISTRO', 400);
     }
 
-    if (expediente.technician_id !== technicianId) {
+    if (userRole !== UserRole.ADMIN && expediente.technician_id !== technicianId) {
       throw new AppError('Solo el técnico asignado puede agregar indicios a este expediente', 403);
     }
 
@@ -85,7 +86,7 @@ export class IndicioService {
     });
   }
 
-  async updateIndicio(id: number, data: UpdateIndicioDTO, userId: number): Promise<Indicio> {
+  async updateIndicio(id: number, data: UpdateIndicioDTO, userId: number, userRole: string): Promise<Indicio> {
     const indicio = await this.indicioRepository.findOne({
       where: { id },
       relations: ['expediente'],
@@ -103,7 +104,7 @@ export class IndicioService {
       throw new AppError('Solo se pueden modificar indicios de expedientes en estado EN_REGISTRO', 400);
     }
 
-    if (indicio.expediente.technician_id !== userId) {
+    if (userRole !== UserRole.ADMIN && indicio.expediente.technician_id !== userId) {
       throw new AppError('Solo el técnico asignado puede modificar este indicio', 403);
     }
 
@@ -129,7 +130,7 @@ export class IndicioService {
     return await this.getIndicioById(id);
   }
 
-  async deleteIndicio(id: number, userId: number): Promise<void> {
+  async deleteIndicio(id: number, userId: number, userRole: string): Promise<void> {
     const indicio = await this.indicioRepository.findOne({
       where: { id },
       relations: ['expediente'],
@@ -147,7 +148,7 @@ export class IndicioService {
       throw new AppError('Solo se pueden eliminar indicios de expedientes en estado EN_REGISTRO', 400);
     }
 
-    if (indicio.expediente.technician_id !== userId) {
+    if (userRole !== UserRole.ADMIN && indicio.expediente.technician_id !== userId) {
       throw new AppError('Solo el técnico asignado puede eliminar este indicio', 403);
     }
 

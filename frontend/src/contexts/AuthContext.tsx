@@ -44,17 +44,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   try {
     console.log('1. Iniciando login con:', credentials.email);
     const response = await apiService.login(credentials);
-    console.log('2. Respuesta completa:', response);
-    console.log('2.1 response.data:', response.data);
-    console.log('2.2 response.data.accessToken:', response.data.accessToken); // ← DEBE DECIR accessToken
-    console.log('2.3 response.data.user:', response.data.user);
-    console.log('2.4 Estructura completa:', JSON.stringify(response, null, 2));
     
     // Backend retorna: { user, accessToken, refreshToken }
     const { accessToken, refreshToken, user: userData } = response.data; // ← accessToken
-    
-    console.log('3. AccessToken extraído:', accessToken); // ← accessToken
-    console.log('4. User extraído:', userData);
     
     if (!accessToken || !userData) {
       throw new Error('Respuesta del servidor incompleta');

@@ -126,7 +126,7 @@ router.use(authenticate);
  */
 router.post(
   '/',
-  authorize(UserRole.TECNICO),
+  authorize(UserRole.TECNICO, UserRole.ADMIN),
   validateBody(CreateIndicioDTO),
   indicioController.createIndicio
 );
@@ -261,7 +261,7 @@ router.get('/expediente/:expedienteId', indicioController.getIndiciosByExpedient
  */
 router.put(
   '/:id',
-  authorize(UserRole.TECNICO),
+  authorize(UserRole.TECNICO, UserRole.ADMIN),
   validateBody(UpdateIndicioDTO),
   indicioController.updateIndicio
 );
@@ -304,6 +304,6 @@ router.put(
  *       404:
  *         description: Indicio no encontrado
  */
-router.delete('/:id', authorize(UserRole.TECNICO), indicioController.deleteIndicio);
+router.delete('/:id', authorize(UserRole.TECNICO, UserRole.ADMIN), indicioController.deleteIndicio);
 
 export default router;

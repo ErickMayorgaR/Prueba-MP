@@ -58,43 +58,32 @@ cd Prueba_Erick
 Crear archivo `backend/.env`:
 
 ```env
-NODE_ENV=production
-PORT=5000
-DB_HOST=database
-DB_PORT=1433
-DB_USERNAME=sa
-DB_PASSWORD=YourStrongPassword123!
-DB_DATABASE=DICRI_DB
-DB_ENCRYPT=true
-DB_TRUST_SERVER_CERTIFICATE=true
-JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
-JWT_EXPIRES_IN=24h
-JWT_REFRESH_SECRET=your-super-secret-refresh-key
-JWT_REFRESH_EXPIRES_IN=7d
-CORS_ORIGIN=http://localhost:3000
+ environment:
+      NODE_ENV: production
+      PORT: 5000
+      API_VERSION: v1
+      DB_HOST: database
+      DB_PORT: 1433
+      DB_USERNAME: sa
+      DB_PASSWORD: 'DICRI_MP_Guatemala_2024!'
+      DB_DATABASE: DICRI_DB
+      DB_ENCRYPT: 'false'
+      DB_TRUST_SERVER_CERTIFICATE: 'true'
+      JWT_SECRET: 'd1cr1_mp_gt_s3cr3t_k3y_pr0duct10n_2024_s3cur3'
+      JWT_REFRESH_SECRET: 'd1cr1_mp_gt_r3fr3sh_s3cr3t_k3y_pr0duct10n_2024'
+      JWT_EXPIRES_IN: '24h'
+      JWT_REFRESH_EXPIRES_IN: '7d'
+      CORS_ORIGIN: 'http://localhost:3000'
+      RATE_LIMIT_WINDOW_MS: '900000'
+      RATE_LIMIT_MAX_REQUESTS: '100'
+      LOG_LEVEL: 'info'
+      LOG_DIR: 'logs'
 ```
 
 3. **Iniciar la aplicación**
 
 ```bash
 docker-compose up -d
-```
-
-4. **Inicializar la base de datos**
-
-```bash
-# Esperar a que SQL Server esté listo (30-40 segundos)
-sleep 40
-
-# Ejecutar script de inicialización
-docker exec -it dicri-database /opt/mssql-tools/bin/sqlcmd \
-  -S localhost -U sa -P "YourStrongPassword123!" \
-  -i /docker-entrypoint-initdb.d/init.sql
-
-# Ejecutar procedimientos almacenados
-docker exec -it dicri-database /opt/mssql-tools/bin/sqlcmd \
-  -S localhost -U sa -P "YourStrongPassword123!" \
-  -i /docker-entrypoint-initdb.d/stored-procedures.sql
 ```
 
 5. **Acceder a la aplicación**
@@ -112,13 +101,6 @@ docker exec -it dicri-database /opt/mssql-tools/bin/sqlcmd \
 | coordinador1 | coordinador1@dicri.gob.gt | Coord123! | COORDINADOR |
 
 **IMPORTANTE:** Cambiar las contraseñas en producción.
-
-## Documentación
-
-- **Manual Técnico**: [docs/MANUAL-TECNICO.md](docs/MANUAL-TECNICO.md)
-- **Arquitectura**: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)
-- **Diagrama ER**: [docs/DATABASE-ER.md](docs/DATABASE-ER.md)
-- **API Docs**: http://localhost:5000/api-docs
 
 ## Flujo de Trabajo
 
@@ -164,6 +146,3 @@ docker-compose build
 ```
 
 ---
-
-**Ministerio Público de Guatemala - DICRI**
-Versión 1.0 - 2024

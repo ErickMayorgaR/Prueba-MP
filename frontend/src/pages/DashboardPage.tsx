@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
 import { GeneralStats } from '../types';
-import { FolderIcon, FileIcon, CheckIcon, XIcon } from '../components/Icons';
+import { FolderIcon, FileIcon, CheckIcon, XIcon, UsersIcon, ChartIcon } from '../components/Icons';
 import { toast } from 'react-toastify';
 
 const DashboardPage: React.FC = () => {
@@ -13,15 +13,19 @@ const DashboardPage: React.FC = () => {
 
   useEffect(() => {
     loadStats();
-  }, []);
+  }, [user?.role]);
 
   const loadStats = async () => {
-    try {
-      const response = await apiService.getGeneralStats();
-      setStats(response.data);
-    } catch (error: any) {
-      toast.error('Error al cargar estadísticas');
-    } finally {
+    if (user?.role === 'ADMIN' || user?.role === 'COORDINADOR') {
+      try {
+        const response = await apiService.getGeneralStats();
+        setStats(response.data);
+      } catch (error: any) {
+        toast.error('Error al cargar estadísticas');
+      } finally {
+        setLoading(false);
+      }
+    } else {
       setLoading(false);
     }
   };
@@ -30,6 +34,85 @@ const DashboardPage: React.FC = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-gray-500">Cargando...</div>
+      </div>
+    );
+  }
+
+  if (user?.role === 'TECNICO') {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600 mt-1">
+            Bienvenido, {user?.full_name} - Técnico
+          </p>
+        </div>
+
+        <div className="card">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Acciones Rápidas
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Link
+              to="/expedientes?action=create"
+              className="group relative overflow-hidden bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              <div className="relative z-10">
+                <FolderIcon className="mx-auto mb-3" size={48} />
+                <p className="font-semibold text-lg">Crear Expediente</p>
+                <p className="text-sm text-primary-100 mt-1">Registrar nuevo caso</p>
+              </div>
+              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+            </Link>
+
+            <Link
+              to="/expedientes"
+              className="group relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-6 text-white shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105"
+            >
+              <div className="relative z-10">
+                <FileIcon className="mx-auto mb-3" size={48} />
+                <p className="font-semibold text-lg">Ver Expedientes</p>
+                <p className="text-sm text-blue-100 mt-1">Consultar mis casos</p>
+              </div>
+              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+            </Link>
+          </div>
+        </div>
+
+        <div className="card bg-blue-50">
+          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+            Guía de Uso
+          </h2>
+          <div className="space-y-3 text-sm text-gray-700">
+            <div className="flex items-start">
+              <span className="text-primary-600 font-bold mr-2">1.</span>
+              <p>Crea un nuevo expediente con la información del caso</p>
+            </div>
+            <div className="flex items-start">
+              <span className="text-primary-600 font-bold mr-2">2.</span>
+              <p>Registra todos los indicios encontrados en la escena</p>
+            </div>
+            <div className="flex items-start">
+              <span className="text-primary-600 font-bold mr-2">3.</span>
+              <p>Envía el expediente a revisión cuando esté completo</p>
+            </div>
+            <div className="flex items-start">
+              <span className="text-primary-600 font-bold mr-2">4.</span>
+              <p>Si es rechazado, puedes reabrirlo para hacer correcciones</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="card border-l-4 border-yellow-500 bg-yellow-50">
+          <h3 className="font-semibold text-gray-900 mb-2">
+            Recuerda
+          </h3>
+          <ul className="space-y-1 text-sm text-gray-700">
+            <li>• Documenta todos los detalles de cada indicio</li>
+            <li>• Verifica la información antes de enviar a revisión</li>
+            <li>• Los expedientes deben tener al menos un indicio</li>
+          </ul>
+        </div>
       </div>
     );
   }
@@ -81,18 +164,15 @@ const DashboardPage: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600 mt-1">
           Bienvenido, {user?.full_name} -{' '}
           {user?.role === 'ADMIN' && 'Administrador'}
-          {user?.role === 'TECNICO' && 'Técnico'}
           {user?.role === 'COORDINADOR' && 'Coordinador'}
         </p>
       </div>
 
-      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
@@ -116,57 +196,65 @@ const DashboardPage: React.FC = () => {
         })}
       </div>
 
-      {/* Quick Actions */}
       <div className="card">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Acciones Rápidas
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {user?.role === 'TECNICO' && (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {user?.role === 'ADMIN' && (
             <Link
               to="/expedientes?action=create"
-              className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors text-center"
+              className="group relative overflow-hidden bg-gradient-to-br from-primary-500 to-primary-600 rounded-lg p-5 text-white shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
-              <FolderIcon className="mx-auto text-gray-400 mb-2" size={32} />
-              <p className="font-medium text-gray-900">Crear Expediente</p>
-              <p className="text-sm text-gray-500">Registrar nuevo caso</p>
+              <div className="relative z-10 text-center">
+                <FolderIcon className="mx-auto mb-2" size={32} />
+                <p className="font-semibold">Crear Expediente</p>
+                <p className="text-xs text-primary-100 mt-1">Registrar nuevo caso</p>
+              </div>
+              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
             </Link>
           )}
 
           <Link
             to="/expedientes"
-            className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors text-center"
+            className="group relative overflow-hidden bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg p-5 text-white shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105"
           >
-            <FolderIcon className="mx-auto text-gray-400 mb-2" size={32} />
-            <p className="font-medium text-gray-900">Ver Expedientes</p>
-            <p className="text-sm text-gray-500">Consultar casos</p>
+            <div className="relative z-10 text-center">
+              <FolderIcon className="mx-auto mb-2" size={32} />
+              <p className="font-semibold">Ver Expedientes</p>
+              <p className="text-xs text-blue-100 mt-1">Consultar casos</p>
+            </div>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
           </Link>
 
-          {(user?.role === 'ADMIN' || user?.role === 'COORDINADOR') && (
-            <Link
-              to="/stats"
-              className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors text-center"
-            >
-              <CheckIcon className="mx-auto text-gray-400 mb-2" size={32} />
-              <p className="font-medium text-gray-900">Ver Estadísticas</p>
-              <p className="text-sm text-gray-500">Reportes y análisis</p>
-            </Link>
-          )}
+          <Link
+            to="/stats"
+            className="group relative overflow-hidden bg-gradient-to-br from-green-500 to-green-600 rounded-lg p-5 text-white shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105"
+          >
+            <div className="relative z-10 text-center">
+              <ChartIcon className="mx-auto mb-2" size={32} />
+              <p className="font-semibold">Ver Estadísticas</p>
+              <p className="text-xs text-green-100 mt-1">Reportes detallados</p>
+            </div>
+            <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+          </Link>
 
           {user?.role === 'ADMIN' && (
             <Link
               to="/users"
-              className="p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary-500 hover:bg-primary-50 transition-colors text-center"
+              className="group relative overflow-hidden bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg p-5 text-white shadow-md hover:shadow-xl transition-all duration-300 hover:scale-105"
             >
-              <CheckIcon className="mx-auto text-gray-400 mb-2" size={32} />
-              <p className="font-medium text-gray-900">Gestionar Usuarios</p>
-              <p className="text-sm text-gray-500">Administrar accesos</p>
+              <div className="relative z-10 text-center">
+                <UsersIcon className="mx-auto mb-2" size={32} />
+                <p className="font-semibold">Gestionar Usuarios</p>
+                <p className="text-xs text-purple-100 mt-1">Administrar accesos</p>
+              </div>
+              <div className="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
             </Link>
           )}
         </div>
       </div>
 
-      {/* Recent Activity or Information */}
       <div className="card">
         <h2 className="text-lg font-semibold text-gray-900 mb-4">
           Información del Sistema

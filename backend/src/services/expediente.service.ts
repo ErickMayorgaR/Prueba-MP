@@ -1,6 +1,6 @@
 import { AppDataSource } from '../config/database';
 import { Expediente, ExpedienteStatus } from '../entities/Expediente';
-// ← CORREGIDO: Eliminado UserRole porque no se usa
+import { UserRole } from '../entities/User';
 import {
   CreateExpedienteDTO,
   UpdateExpedienteDTO,
@@ -11,7 +11,6 @@ import { AppError } from '../middleware/error.middleware';
 
 export class ExpedienteService {
   private expedienteRepository = AppDataSource.getRepository(Expediente);
-  // ← CORREGIDO: Eliminado userRepository porque no se usa
 
   async createExpediente(data: CreateExpedienteDTO, technicianId: number): Promise<Expediente> {
     const existingExpediente = await this.expedienteRepository.findOne({
@@ -87,7 +86,7 @@ export class ExpedienteService {
     return await queryBuilder.orderBy('expediente.created_at', 'DESC').getMany();
   }
 
-  async updateExpediente(id: number, data: UpdateExpedienteDTO, userId: number): Promise<Expediente> {
+  async updateExpediente(id: number, data: UpdateExpedienteDTO, userId: number, userRole: string): Promise<Expediente> {
     const expediente = await this.expedienteRepository.findOne({
       where: { id },
       relations: ['technician'],
@@ -101,7 +100,7 @@ export class ExpedienteService {
       throw new AppError('Solo se pueden modificar expedientes en estado EN_REGISTRO', 400);
     }
 
-    if (expediente.technician_id !== userId) {
+    if (userRole !== UserRole.ADMIN && expediente.technician_id !== userId) {
       throw new AppError('Solo el técnico asignado puede modificar este expediente', 403);
     }
 
@@ -114,7 +113,7 @@ export class ExpedienteService {
     return await this.getExpedienteById(id);
   }
 
-  async submitForReview(id: number, userId: number): Promise<Expediente> {
+  async submitForReview(id: number, userId: number, userRole: string): Promise<Expediente> {
     const expediente = await this.expedienteRepository.findOne({
       where: { id },
       relations: ['indicios'],
@@ -128,7 +127,7 @@ export class ExpedienteService {
       throw new AppError('Solo se pueden enviar a revisión expedientes en estado EN_REGISTRO', 400);
     }
 
-    if (expediente.technician_id !== userId) {
+    if (userRole !== UserRole.ADMIN && expediente.technician_id !== userId) {
       throw new AppError('Solo el técnico asignado puede enviar este expediente a revisión', 403);
     }
 
@@ -143,7 +142,7 @@ export class ExpedienteService {
     return await this.getExpedienteById(id);
   }
 
-  async approveExpediente(id: number, coordinatorId: number): Promise<Expediente> {
+  async approveExpediente(id: number, coordinatorId: number, userRole: string): Promise<Expediente> {
     const expediente = await this.expedienteRepository.findOne({
       where: { id },
     });
@@ -156,6 +155,10 @@ export class ExpedienteService {
       throw new AppError('Solo se pueden aprobar expedientes en estado EN_REVISION', 400);
     }
 
+    if (userRole !== UserRole.ADMIN && userRole !== UserRole.COORDINADOR) {
+      throw new AppError('Solo coordinadores o administradores pueden aprobar expedientes', 403);
+    }
+
     expediente.status = ExpedienteStatus.APROBADO;
     expediente.coordinator_id = coordinatorId;
     expediente.reviewed_at = new Date();
@@ -166,7 +169,7 @@ export class ExpedienteService {
     return await this.getExpedienteById(id);
   }
 
-  async rejectExpediente(id: number, data: RejectExpedienteDTO, coordinatorId: number): Promise<Expediente> {
+  async rejectExpediente(id: number, data: RejectExpedienteDTO, coordinatorId: number, userRole: string): Promise<Expediente> {
     const expediente = await this.expedienteRepository.findOne({
       where: { id },
     });
@@ -179,6 +182,10 @@ export class ExpedienteService {
       throw new AppError('Solo se pueden rechazar expedientes en estado EN_REVISION', 400);
     }
 
+    if (userRole !== UserRole.ADMIN && userRole !== UserRole.COORDINADOR) {
+      throw new AppError('Solo coordinadores o administradores pueden rechazar expedientes', 403);
+    }
+
     expediente.status = ExpedienteStatus.RECHAZADO;
     expediente.coordinator_id = coordinatorId;
     expediente.rejection_reason = data.rejection_reason;
@@ -188,7 +195,7 @@ export class ExpedienteService {
     return await this.getExpedienteById(id);
   }
 
-  async reopenExpediente(id: number, userId: number): Promise<Expediente> {
+  async reopenExpediente(id: number, userId: number, userRole: string): Promise<Expediente> {
     const expediente = await this.expedienteRepository.findOne({
       where: { id },
     });
@@ -201,7 +208,7 @@ export class ExpedienteService {
       throw new AppError('Solo se pueden reabrir expedientes rechazados', 400);
     }
 
-    if (expediente.technician_id !== userId) {
+    if (userRole !== UserRole.ADMIN && expediente.technician_id !== userId) {
       throw new AppError('Solo el técnico asignado puede reabrir este expediente', 403);
     }
 

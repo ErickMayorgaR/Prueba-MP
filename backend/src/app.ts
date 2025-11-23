@@ -1,4 +1,4 @@
-import express, { Application, Request, Response } from 'express'; // ← AGREGADO Request, Response
+import express, { Application, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import morgan from 'morgan';
 import swaggerJsDoc from 'swagger-jsdoc';
@@ -15,6 +15,7 @@ import {
   sanitizeMiddleware,
 } from './middleware/security.middleware';
 import { errorHandler, notFoundHandler } from './middleware/error.middleware';
+import { requestLogger } from './middleware/logger.middleware';
 
 dotenv.config();
 
@@ -77,6 +78,8 @@ app.use(
     },
   })
 );
+
+app.use(requestLogger);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 

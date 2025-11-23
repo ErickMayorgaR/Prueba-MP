@@ -4,13 +4,14 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import { useAuth } from '../contexts/AuthContext';
 import { toast } from 'react-toastify';
+import { EyeIcon, EyeOffIcon } from '../components/Icons';
 
 const validationSchema = Yup.object({
   email: Yup.string()
     .email('Correo electrónico inválido')
     .required('El correo es requerido'),
   password: Yup.string()
-    .min(6, 'La contraseña debe tener al menos 6 caracteres')
+    .min(6, 'La contraseña debe tener al menos 8 caracteres')
     .required('La contraseña es requerida'),
 });
 
@@ -19,8 +20,8 @@ const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
-  // Navega cuando isAuthenticated cambie a true
   useEffect(() => {
     if (isAuthenticated && loginSuccess) {
       navigate('/');
@@ -38,7 +39,7 @@ const LoginPage: React.FC = () => {
       try {
         await login(values);
         toast.success('¡Inicio de sesión exitoso!');
-        setLoginSuccess(true); // Activa el useEffect para navegar
+        setLoginSuccess(true);
       } catch (error: any) {
         const errorMessage =
           error.response?.data?.message || 'Error al iniciar sesión';
@@ -55,7 +56,7 @@ const LoginPage: React.FC = () => {
         <div>
           <div className="flex justify-center mb-6">
             <img
-              src="https://www.dicri.gob.gt/wp-content/uploads/2020/07/logo-ministerio-publico-guatemala.png"
+              src="/mp-logo.png"
               alt="Ministerio Público"
               className="h-20"
             />
@@ -101,21 +102,35 @@ const LoginPage: React.FC = () => {
               <label htmlFor="password" className="label">
                 Contraseña
               </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="current-password"
-                className={`input ${
-                  formik.touched.password && formik.errors.password
-                    ? 'border-danger-500'
-                    : ''
-                }`}
-                placeholder="••••••••"
-                value={formik.values.password}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-              />
+              <div className="relative">
+                <input
+                  id="password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  className={`input pr-10 ${
+                    formik.touched.password && formik.errors.password
+                      ? 'border-danger-500'
+                      : ''
+                  }`}
+                  placeholder="••••••••"
+                  value={formik.values.password}
+                  onChange={formik.handleChange}
+                  onBlur={formik.handleBlur}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  tabIndex={-1}
+                >
+                  {showPassword ? (
+                    <EyeOffIcon size={20} />
+                  ) : (
+                    <EyeIcon size={20} />
+                  )}
+                </button>
+              </div>
               {formik.touched.password && formik.errors.password && (
                 <p className="mt-1 text-xs text-danger-600">
                   {formik.errors.password}

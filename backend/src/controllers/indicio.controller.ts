@@ -12,7 +12,7 @@ export class IndicioController {
         return;
       }
 
-      const indicio = await indicioService.createIndicio(req.body, req.user.id);
+      const indicio = await indicioService.createIndicio(req.body, req.user.id, req.user.role);
 
       res.status(201).json({
         success: true,
@@ -60,7 +60,7 @@ export class IndicioController {
       }
 
       const id = parseInt(req.params.id);
-      const indicio = await indicioService.updateIndicio(id, req.body, req.user.id);
+      const indicio = await indicioService.updateIndicio(id, req.body, req.user.id, req.user.role);
 
       res.status(200).json({
         success: true,
@@ -80,7 +80,7 @@ export class IndicioController {
       }
 
       const id = parseInt(req.params.id);
-      await indicioService.deleteIndicio(id, req.user.id);
+      await indicioService.deleteIndicio(id, req.user.id, req.user.role);
 
       res.status(200).json({
         success: true,

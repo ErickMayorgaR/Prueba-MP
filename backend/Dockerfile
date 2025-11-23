@@ -1,4 +1,3 @@
-# Build stage
 FROM node:18-alpine AS builder
 
 WORKDIR /app
@@ -9,7 +8,6 @@ RUN npm install
 COPY . .
 RUN npm run build
 
-# Production stage
 FROM node:18-alpine
 
 WORKDIR /app
@@ -23,8 +21,10 @@ COPY --from=builder --chown=nodejs:nodejs /app/dist ./dist
 COPY --from=builder --chown=nodejs:nodejs /app/src ./src
 COPY --from=builder --chown=nodejs:nodejs /app/node_modules ./node_modules
 COPY --from=builder --chown=nodejs:nodejs /app/package.json ./package.json
+COPY --from=builder --chown=nodejs:nodejs /app/jest.config.js ./jest.config.js
+COPY --from=builder --chown=nodejs:nodejs /app/tests ./tests
 
-RUN mkdir -p logs && chown nodejs:nodejs logs
+RUN mkdir -p logs && chown nodejs:nodejs logs && chmod 755 logs
 
 USER nodejs
 
